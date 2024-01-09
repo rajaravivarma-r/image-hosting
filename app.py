@@ -14,7 +14,6 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from memegram.db.models import Image, Tag
 
-
 logger = logging.getLogger('peewee')
 logger.setLevel(logging.DEBUG)
 
