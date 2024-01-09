@@ -10,7 +10,7 @@ from sanic import Sanic
 from sanic.response import json, html, redirect
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from memegram.db.models import Image
+from memegram.db.models import Image, Tag
 
 UPLOAD_DIRECTORY = "./static/pictures"
 VIEWS_PATH = Path(__file__).parent.joinpath("views")
@@ -31,14 +31,17 @@ app.static("/js", "./static/js", name="js")
 app.static("/images", "./static/pictures", name="images")
 
 
-def save_image_details(image_file, image_filepath):
+def save_image_details(image_file, image_filepath, image_tags=None):
     image_digest = md5(image_file.body).hexdigest()
     try:
-        Image.create(
-            filename=image_file.name,
-            filepath=image_filepath,
-            digest=image_digest,
-        )
+        with Image.transaction():
+            image = Image.create(
+                filename=image_file.name,
+                filepath=image_filepath,
+                digest=image_digest,
+            )
+            tags = [Tag.create(name=tag_name) for tag_name in image_tags]
+            image.tags = tags
         return True
     except peewee.IntegrityError as e:
         print("Duplicate file detected")
@@ -76,10 +79,11 @@ async def test(request):
 @app.route("/upload", methods=["POST"])
 async def upload(request):
     picture_file = request.files["picture"][0]
+    image_tags = set(request.form.get('tags').split(','))
     if len(picture_file.name) > 0:
         filepath = os.path.join(UPLOAD_DIRECTORY, picture_file.name)
 
-        if save_image_details(picture_file, filepath):
+        if save_image_details(picture_file, filepath, image_tags):
             with open(filepath, "wb") as f:
                 f.write(picture_file.body)
             jinja.flash(request, "successfully saved image", "success")
