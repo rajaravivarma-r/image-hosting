@@ -15,7 +15,7 @@ from memegram.db.models import Image
 UPLOAD_DIRECTORY = "./static/pictures"
 VIEWS_PATH = Path(__file__).parent.joinpath("views")
 
-app = Sanic()
+app = Sanic('memegram', inspector=True)
 
 jinja = SanicJinja2(app, loader=FileSystemLoader(str(VIEWS_PATH)))
 session = InMemorySessionInterface(cookie_name=app.name, prefix=app.name)
@@ -24,9 +24,9 @@ jinja.add_env(
     "image_static_url", partial(app.url_for, "static", name="images")
 )
 # Serve CSS files
-app.static("/css", "./static/css")
+app.static("/css", "./static/css", name="css")
 # Serve JS files
-app.static("/js", "./static/js")
+app.static("/js", "./static/js", name="js")
 # Serve Image files
 app.static("/images", "./static/pictures", name="images")
 
