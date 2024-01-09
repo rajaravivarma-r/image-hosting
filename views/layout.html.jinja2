@@ -3,6 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/css/bootstrap.css">
+    <link rel="stylesheet" href="/css/app/app.css">
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.js"></script>
   </head>
@@ -39,6 +40,15 @@
               <form action="upload" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                   <input id="picture" type="file" name="picture" accept="image/*" class="form-control">
+
+                  <label for="tagsInput" class="form-label">Enter Tags:</label>
+                  <div class="input-group mb-3">
+                      <input type="text" id="tagsInput" class="form-control" placeholder="Add tags">
+                      <button class="btn btn-outline-secondary ml-1" type="button" id="addTagButton">Add</button>
+                  </div>
+                  <div id="tagsContainer" class="d-flex justify-content-center gap-3"></div>
+                  <!-- Hidden input field to store tags for form submission -->
+                  <input type="hidden" name="tags" id="hiddenTagsInput">
                 </div>
                 <button class="btn btn-primary" type="submit">Upload</button>
               </form>
@@ -57,7 +67,7 @@
           {% endfor %}
         </div>
       {% endif %}
-
+      <script src="/js/app/tag_input.js"></script>
     </div>
   </body>
 </html>
