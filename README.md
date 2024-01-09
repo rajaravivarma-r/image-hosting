@@ -40,5 +40,11 @@ Before setting up the development environment, make sure you have the following 
 ### In debug mode
 `sanic app:app --debug`
 
+### Debugging using breakpoint
+Make sure the app is running in a single process mode by sending `--single-process` flag
+`sanic --debug --single-process app:app`
+
+The `--reload` flag needs to run multiple processes, one for watching the file changes and one for the actual application, so this flag should not be supplied when debugging using breakpoints.
+
 ### In production mode
 `sanic app:app`
