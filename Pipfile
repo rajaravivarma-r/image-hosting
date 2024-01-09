@@ -12,6 +12,8 @@ sanic-session = "*"
 
 [dev-packages]
 ptpython = "*"
+litecli = "*"
+black = "*"
 
 [requires]
 python_version = "3.8"
