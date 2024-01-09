@@ -82,11 +82,11 @@ async def upload(request):
         if save_image_details(picture_file, filepath):
             with open(filepath, "wb") as f:
                 f.write(picture_file.body)
-            request["flash"]("successfully saved image", "success")
+            jinja.flash(request, "successfully saved image", "success")
         else:
-            request["flash"]("Image file already exists", "danger")
+            jinja.flash(request, "Image file already exists", "danger")
     else:
-        request["flash"]("Please upload a file", "danger")
+        jinja.flash(request, "Please upload a file", "danger")
 
     return redirect(app.url_for("index"))
 
