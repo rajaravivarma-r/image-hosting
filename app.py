@@ -1,4 +1,6 @@
 import os
+import logging
+
 from pathlib import Path
 from hashlib import md5
 from functools import partial
@@ -11,6 +13,13 @@ from sanic.response import json, html, redirect
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from memegram.db.models import Image, Tag
+
+
+logger = logging.getLogger('peewee')
+logger.setLevel(logging.DEBUG)
+
+file_handler = logging.FileHandler('./logs/sql.log')
+logger.addHandler(file_handler)
 
 UPLOAD_DIRECTORY = "./static/pictures"
 VIEWS_PATH = Path(__file__).parent.joinpath("views")
