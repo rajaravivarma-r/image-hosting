@@ -70,7 +70,7 @@ def render_template(filename, request, **template_variables):
 
 @app.route("/")
 async def test(request):
-    return json({"hello": "world"})
+    return redirect(app.url_for("index"))
 
 
 @app.route("/upload", methods=["POST"])
