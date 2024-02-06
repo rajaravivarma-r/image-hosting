@@ -1,6 +1,7 @@
 # App
 This project serves as a comprehensive example of the various components employed in a modern web application. It showcases the integration of a backend framework, a CSS library for presentation, a database for data storage, and a templating library for rendering views. The implementation adheres to the Model-View-Controller (MVC) architecture.
-Components Used
+
+The following shows the list of components used in the codebase.
 
 ## Backend
 ### Sanic - GitHub
