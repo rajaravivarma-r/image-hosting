@@ -1,6 +1,4 @@
 import os
-import logging
-
 from pathlib import Path
 from hashlib import md5
 from functools import partial
@@ -12,18 +10,12 @@ from sanic import Sanic
 from sanic.response import json, html, redirect
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from memegram.db.models import Image, Tag
-
-logger = logging.getLogger('peewee')
-logger.setLevel(logging.DEBUG)
-
-file_handler = logging.FileHandler('./logs/sql.log')
-logger.addHandler(file_handler)
+from memegram.db.models import Image
 
 UPLOAD_DIRECTORY = "./static/pictures"
 VIEWS_PATH = Path(__file__).parent.joinpath("views")
 
-app = Sanic('memegram', inspector=True)
+app = Sanic('image-gallery')
 
 jinja = SanicJinja2(app, loader=FileSystemLoader(str(VIEWS_PATH)))
 session = InMemorySessionInterface(cookie_name=app.name, prefix=app.name)
@@ -39,17 +31,14 @@ app.static("/js", "./static/js", name="js")
 app.static("/images", "./static/pictures", name="images")
 
 
-def save_image_details(image_file, image_filepath, image_tags=None):
+def save_image_details(image_file, image_filepath):
     image_digest = md5(image_file.body).hexdigest()
     try:
-        with Image.transaction():
-            image = Image.create(
-                filename=image_file.name,
-                filepath=image_filepath,
-                digest=image_digest,
-            )
-            tags = [Tag.create(name=tag_name) for tag_name in image_tags]
-            image.tags = tags
+        Image.create(
+            filename=image_file.name,
+            filepath=image_filepath,
+            digest=image_digest,
+        )
         return True
     except peewee.IntegrityError as e:
         print("Duplicate file detected")
@@ -81,23 +70,25 @@ def render_template(filename, request, **template_variables):
 
 @app.route("/")
 async def test(request):
-    return redirect(app.url_for("index"))
+    return json({"hello": "world"})
 
 
 @app.route("/upload", methods=["POST"])
 async def upload(request):
     picture_file = request.files["picture"][0]
-    image_tags = set(request.form.get('tags').split(','))
     if len(picture_file.name) > 0:
         filepath = os.path.join(UPLOAD_DIRECTORY, picture_file.name)
 
-        if save_image_details(picture_file, filepath, image_tags):
+        if save_image_details(picture_file, filepath):
             with open(filepath, "wb") as f:
                 f.write(picture_file.body)
+            # request["flash"]("successfully saved image", "success")
             jinja.flash(request, "successfully saved image", "success")
         else:
+            # request["flash"]("Image file already exists", "danger")
             jinja.flash(request, "Image file already exists", "danger")
     else:
+        # request["flash"]("Please upload a file", "danger")
         jinja.flash(request, "Please upload a file", "danger")
 
     return redirect(app.url_for("index"))
